@@ -29,17 +29,7 @@ A mobile-first web app for managing book clubs. Create clubs, invite members via
    - `supabase/migrations/001_initial_schema.sql`
    - `supabase/migrations/002_fix_club_members_rls.sql`
 
-3. **Configure environment variables** — copy `.env.local.example` to `.env.local`:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=
-   SUPABASE_SERVICE_ROLE_KEY=
-
-   # Optional — needed for SMS reminders
-   TWILIO_ACCOUNT_SID=
-   TWILIO_AUTH_TOKEN=
-   TWILIO_PHONE_NUMBER=
-   ```
+3. **Configure environment variables** — copy `.env.local.example` to `.env.local` and fill in your Supabase and (optionally) Twilio credentials.
 
 4. **Run the dev server**
    ```bash

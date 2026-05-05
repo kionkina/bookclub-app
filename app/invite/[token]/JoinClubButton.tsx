@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { joinClub } from '@/lib/actions/clubs';
@@ -15,6 +15,20 @@ export function JoinClubButton({ token, clubId }: Props) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Auto-join when landing back here after login redirect
+  useEffect(() => {
+    async function autoJoin() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setLoading(true);
+      await joinClub(token);
+      // joinClub redirects on success
+      setLoading(false);
+    }
+    autoJoin();
+  }, [token]);
+
   async function handleJoin() {
     setLoading(true);
 
@@ -27,7 +41,6 @@ export function JoinClubButton({ token, clubId }: Props) {
     }
 
     await joinClub(token);
-    // joinClub redirects on success
     setLoading(false);
   }
 

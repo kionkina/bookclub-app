@@ -93,14 +93,16 @@ export async function updateProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized' };
 
-  const display_name = formData.get('display_name') as string;
+  const display_name = (formData.get('display_name') as string | null)?.trim();
   const phone = formData.get('phone') as string | null;
   const timezone = formData.get('timezone') as string | null;
+
+  if (!display_name) return { error: 'Display name is required' };
 
   const { error } = await supabase
     .from('profiles')
     .update({
-      display_name: display_name?.trim() || null,
+      display_name,
       phone: phone?.trim() || null,
       timezone: timezone || 'UTC',
       updated_at: new Date().toISOString(),

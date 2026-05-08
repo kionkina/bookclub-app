@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { updateProfile } from '@/lib/actions/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,18 +12,25 @@ import type { Profile } from '@/lib/types';
 interface Props {
   profile: Profile | null;
   email?: string;
+  welcome?: boolean;
 }
 
-export function ProfileForm({ profile, email }: Props) {
+export function ProfileForm({ profile, email, welcome }: Props) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     const result = await updateProfile(new FormData(e.currentTarget));
-    if (result?.error) toast.error(result.error);
-    else toast.success('Profile saved!');
+    if (result?.error) {
+      toast.error(result.error);
+      setLoading(false);
+      return;
+    }
+    toast.success('Profile saved!');
     setLoading(false);
+    if (welcome) router.push('/clubs');
   }
 
   return (
@@ -40,6 +48,8 @@ export function ProfileForm({ profile, email }: Props) {
           name="display_name"
           defaultValue={profile?.display_name ?? ''}
           placeholder="Your name"
+          required
+          minLength={1}
         />
       </div>
       <div className="space-y-1.5">
@@ -58,7 +68,7 @@ export function ProfileForm({ profile, email }: Props) {
         />
       </div>
       <Button type="submit" disabled={loading}>
-        {loading ? 'Saving...' : 'Save profile'}
+        {loading ? 'Saving...' : welcome ? 'Continue' : 'Save profile'}
       </Button>
     </form>
   );

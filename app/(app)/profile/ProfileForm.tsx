@@ -18,6 +18,8 @@ interface Props {
 export function ProfileForm({ profile, email, welcome }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
+  const [phone, setPhone] = useState(profile?.phone ?? '');
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,7 +48,8 @@ export function ProfileForm({ profile, email, welcome }: Props) {
         <Input
           id="display_name"
           name="display_name"
-          defaultValue={profile?.display_name ?? ''}
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
           placeholder="Your name"
           required
           minLength={1}
@@ -63,7 +66,8 @@ export function ProfileForm({ profile, email, welcome }: Props) {
           id="phone"
           name="phone"
           type="tel"
-          defaultValue={profile?.phone ?? ''}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           placeholder="+1 555 000 0000"
         />
       </div>

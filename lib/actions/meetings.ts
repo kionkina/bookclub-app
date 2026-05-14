@@ -8,7 +8,8 @@ export async function createMeeting(
   title: string,
   description: string | null,
   location: string | null,
-  dateOptions: string[]
+  dateOptions: string[],
+  targetPage: number | null = null
 ) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,6 +22,7 @@ export async function createMeeting(
       title,
       description: description || null,
       location: location || null,
+      target_page: targetPage,
       created_by: user.id,
       status: 'polling',
     })

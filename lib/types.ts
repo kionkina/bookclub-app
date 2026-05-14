@@ -62,6 +62,7 @@ export type Meeting = {
   status: 'polling' | 'confirmed' | 'cancelled';
   confirmed_at: string | null;
   book_id: string | null;
+  target_page: number | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

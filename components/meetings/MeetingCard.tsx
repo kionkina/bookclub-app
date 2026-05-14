@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import type { Meeting } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, MapPin, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { DatePollGrid } from './DatePollGrid';
 import { confirmMeetingDate, cancelMeeting } from '@/lib/actions/meetings';
 import { toast } from 'sonner';
@@ -67,6 +67,13 @@ export function MeetingCard({ meeting, clubId, currentUserId, isAdmin }: Props) 
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
                 {meeting.location}
+              </div>
+            )}
+
+            {meeting.target_page != null && (
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <BookOpen className="w-3.5 h-3.5" />
+                Read to pg {meeting.target_page}
               </div>
             )}
           </div>

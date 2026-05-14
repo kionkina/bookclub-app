@@ -4,6 +4,7 @@ import { SetBookForm } from '@/components/book/SetBookForm';
 import { CurrentBookCard } from '@/components/book/CurrentBookCard';
 import { ProgressList } from '@/components/book/ProgressList';
 import { PageProgressForm } from '@/components/book/PageProgressForm';
+import { NextMeetingTarget } from '@/components/book/NextMeetingTarget';
 import { BookOpen } from 'lucide-react';
 
 export default async function BookPage({
@@ -41,6 +42,17 @@ export default async function BookPage({
 
   const myProgress = progress?.find((p) => p.user_id === user!.id);
 
+  const { data: nextMeeting } = await supabase
+    .from('meetings')
+    .select('id, title, confirmed_at, target_page')
+    .eq('club_id', clubId)
+    .eq('status', 'confirmed')
+    .gte('confirmed_at', new Date().toISOString())
+    .not('target_page', 'is', null)
+    .order('confirmed_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
   return (
     <div className="px-4 space-y-4">
       {!book ? (
@@ -53,6 +65,13 @@ export default async function BookPage({
       ) : (
         <>
           <CurrentBookCard book={book} />
+          {nextMeeting && (
+            <NextMeetingTarget
+              targetPage={nextMeeting.target_page!}
+              meetingDate={nextMeeting.confirmed_at!}
+              myPage={myProgress?.current_page ?? 0}
+            />
+          )}
           <PageProgressForm
             clubId={clubId}
             bookId={book.id}

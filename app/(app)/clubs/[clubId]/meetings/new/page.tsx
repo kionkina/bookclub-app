@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createMeeting } from '@/lib/actions/meetings';
+import { createClient } from '@/lib/supabase/client';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,19 @@ export default function NewMeetingPage() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [dateOptions, setDateOptions] = useState<string[]>(['']);
+  const [targetPage, setTargetPage] = useState('');
+  const [book, setBook] = useState<{ title: string; page_count: number | null } | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from('books')
+      .select('title, page_count')
+      .eq('club_id', clubId)
+      .eq('status', 'current')
+      .maybeSingle()
+      .then(({ data }) => setBook(data));
+  }, [clubId]);
 
   function addOption() {
     setDateOptions([...dateOptions, '']);
@@ -42,12 +56,14 @@ export default function NewMeetingPage() {
     setLoading(true);
 
     const validDates = dateOptions.filter((d) => d.trim());
+    const parsedTarget = targetPage.trim() ? parseInt(targetPage, 10) : null;
     const result = await createMeeting(
       clubId,
       title.trim(),
       description.trim() || null,
       location.trim() || null,
-      validDates
+      validDates,
+      Number.isFinite(parsedTarget) ? parsedTarget : null
     );
 
     if (result?.error) {
@@ -83,6 +99,32 @@ export default function NewMeetingPage() {
           <Label htmlFor="location">Location <span className="text-muted-foreground font-normal">(optional)</span></Label>
           <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Sarah's place or a Zoom link" />
         </div>
+
+        {book && (
+          <div className="space-y-1.5">
+            <Label htmlFor="target_page">
+              Read to page{' '}
+              <span className="text-muted-foreground font-normal text-xs">
+                (optional — target for {book.title})
+              </span>
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="target_page"
+                type="number"
+                min={1}
+                max={book.page_count ?? undefined}
+                value={targetPage}
+                onChange={(e) => setTargetPage(e.target.value)}
+                className="w-28"
+                placeholder="e.g. 120"
+              />
+              {book.page_count && (
+                <span className="text-sm text-muted-foreground">of {book.page_count}</span>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label>Proposed dates</Label>
